@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In | Tech Blogs{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5 col-lg-4">
+      
+      <div class="card-modern shadow-lg overflow-hidden border-0">
+        
+        <div class="bg-gradient p-4 text-center text-white" style="background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #f97316 100%);">
+          <div class="brand-icon-box mx-auto mb-2" style="width: 48px; height: 48px; font-size: 1.4rem;">
+            <i class="fa-solid fa-terminal"></i>
+          </div>
+          <h3 class="font-heading fw-bold mb-1">Welcome Back</h3>
+          <p class="small text-white opacity-75 mb-0">Sign in to Tech Blogs to write, comment & collaborate.</p>
+        </div>
+
+        <div class="card-body p-4 p-md-5 bg-white">
+          <form method="POST">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger rounded-3 small mb-3">
+                {% for error in form.non_field_errors %}
+                  <div><i class="fa-solid fa-circle-exclamation me-1"></i> {{ error }}</div>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <div class="mb-3">
+              <label for="{{ form.username.id_for_label }}" class="form-label font-heading fw-semibold text-dark small">Username</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0"><i class="fa-solid fa-user"></i></span>
+                <input type="text" name="username" class="form-control border-start-0 shadow-none" placeholder="Enter username" required id="{{ form.username.id_for_label }}">
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="{{ form.password.id_for_label }}" class="form-label font-heading fw-semibold text-dark small mb-0">Password</label>
+                <a href="{% url 'password_reset' %}" class="small text-primary text-decoration-none">Forgot password?</a>
+              </div>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0"><i class="fa-solid fa-lock"></i></span>
+                <input type="password" name="password" class="form-control border-start-0 shadow-none" placeholder="Enter password" required id="{{ form.password.id_for_label }}">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary-grad w-100 py-2.5 mb-3 shadow-md">
+              <i class="fa-solid fa-right-to-bracket me-1.5"></i> Sign In to Tech Blogs
+            </button>
+
+            <div class="text-center text-muted small">
+              Don't have an account? <a href="{% url 'signup' %}" class="text-primary text-decoration-none fw-bold">Create Account</a>
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{
+  "venvPath": ".",
+  "venv": ".venv",
+  "exclude": [
+    ".venv"
+  ],
+  "extraPaths": [
+    ".venv/Lib/site-packages"
+  ],
+  "reportAttributeAccessIssue": "none",
+  "reportMissingImports": "none",
+  "reportUntypedImport": "none",
+  "reportGeneralTypeIssues": "none",
+  "reportOptionalMemberAccess": "none",
+  "reportCallIssue": "none",
+  "reportArgumentType": "none"
+}
+

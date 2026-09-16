@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Account | Tech Blogs{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+      
+      <div class="card-modern shadow-lg overflow-hidden border-0">
+        
+        <div class="bg-gradient p-4 text-center text-white" style="background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #f97316 100%);">
+          <div class="brand-icon-box mx-auto mb-2" style="width: 48px; height: 48px; font-size: 1.4rem;">
+            <i class="fa-solid fa-user-plus"></i>
+          </div>
+          <h3 class="font-heading fw-bold mb-1">Join Tech Blogs Today</h3>
+          <p class="small text-white opacity-75 mb-0">Create your author profile and share tech insights with developers worldwide.</p>
+        </div>
+
+        <div class="card-body p-4 p-md-5 bg-white">
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% if form.errors %}
+              <div class="alert alert-danger rounded-3 small mb-4">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i> Please check and correct the highlighted fields below.
+              </div>
+            {% endif %}
+
+            <h6 class="font-heading fw-bold text-muted text-uppercase mb-3 extra-small tracking-wider border-bottom pb-2">
+              <i class="fa-solid fa-user me-1"></i> User Credentials
+            </h6>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label font-heading fw-semibold text-dark small">Username <span class="text-danger">*</span></label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                  <div class="text-danger extra-small mt-1">{{ form.username.errors|striptags }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label font-heading fw-semibold text-dark small">Email Address <span class="text-danger">*</span></label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                  <div class="text-danger extra-small mt-1">{{ form.email.errors|striptags }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label font-heading fw-semibold text-dark small">First Name</label>
+                {{ form.first_name }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label font-heading fw-semibold text-dark small">Last Name</label>
+                {{ form.last_name }}
+              </div>
+            </div>
+
+            <h6 class="font-heading fw-bold text-muted text-uppercase mb-3 extra-small tracking-wider border-bottom pb-2">
+              <i class="fa-solid fa-key me-1"></i> Account Security
+            </h6>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label font-heading fw-semibold text-dark small">Password <span class="text-danger">*</span></label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                  <div class="text-danger extra-small mt-1">{{ form.password1.errors|striptags }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label font-heading fw-semibold text-dark small">Confirm Password <span class="text-danger">*</span></label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                  <div class="text-danger extra-small mt-1">{{ form.password2.errors|striptags }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <h6 class="font-heading fw-bold text-muted text-uppercase mb-3 extra-small tracking-wider border-bottom pb-2">
+              <i class="fa-solid fa-id-card me-1"></i> Public Profile Details
+            </h6>
+
+            <div class="mb-3">
+              <label class="form-label font-heading fw-semibold text-dark small">Biography</label>
+              {{ form.bio }}
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label font-heading fw-semibold text-dark small">Profile Avatar</label>
+              {{ form.avatar }}
+            </div>
+
+            <button type="submit" class="btn btn-primary-grad w-100 py-2.5 mb-3 shadow-md">
+              <i class="fa-solid fa-user-check me-1.5"></i> Create My Account
+            </button>
+
+            <div class="text-center text-muted small">
+              Already have an account? <a href="{% url 'login' %}" class="text-primary text-decoration-none fw-bold">Sign In</a>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

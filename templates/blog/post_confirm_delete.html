@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Post Confirmation | Tech Blogs{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      
+      <div class="card-modern shadow-lg text-center p-4 p-md-5">
+        <div class="stat-icon bg-danger bg-opacity-10 text-danger mx-auto mb-4" style="width: 72px; height: 72px; font-size: 2rem;">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+
+        <h3 class="font-heading fw-bold text-dark mb-2">Delete Article?</h3>
+        <p class="text-secondary mb-4">
+          Are you sure you want to permanently delete <strong class="text-dark">"{{ object.title }}"</strong>? This action cannot be undone and will remove all comments and likes associated with this post.
+        </p>
+
+        <form method="POST">
+          {% csrf_token %}
+          <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'blog:dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4">
+              Cancel
+            </a>
+            <button type="submit" class="btn btn-danger rounded-pill px-4 fw-semibold shadow-sm">
+              <i class="fa-solid fa-trash-can me-1.5"></i> Yes, Delete Article
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

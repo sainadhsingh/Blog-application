@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+
+{% block title %}Tech Blogs | Modern Tech & Engineering Articles{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Hero Section -->
+  <div class="hero-wrapper mb-5">
+    <div class="row align-items-center position-relative z-1">
+      <div class="col-lg-8">
+        <span class="badge bg-primary bg-opacity-25 text-white px-3 py-1.5 rounded-pill mb-3 fw-semibold border border-primary border-opacity-50">
+          <i class="fa-solid fa-sparkles text-warning me-1.5"></i> Engineering Insights & Architecture
+        </span>
+        <h1 class="display-4 font-heading fw-extrabold text-white mb-3 lh-sm">
+          Master Modern Tech & Software Engineering
+        </h1>
+        <p class="lead text-white opacity-85 mb-4 max-w-2xl font-light">
+          Deep-dive technical articles, system design patterns, and practical guides written by builders for builders.
+        </p>
+
+        <!-- Topic Filter Badges in Hero -->
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          <span class="small text-white opacity-75 fw-medium"><i class="fa-solid fa-filter me-1"></i> Quick Filters:</span>
+          <a href="{% url 'blog:home' %}" class="btn btn-outline-glass btn-sm rounded-pill px-3 {% if not current_category and not current_tag %}active bg-white text-dark fw-bold{% endif %}">
+            All Posts
+          </a>
+          {% for cat in global_categories %}
+            <a href="{{ cat.get_absolute_url }}" class="btn btn-outline-glass btn-sm rounded-pill px-3 {% if current_category.slug == cat.slug %}active bg-primary text-white border-primary{% endif %}">
+              {{ cat.name }}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+      
+      <div class="col-lg-4 d-none d-lg-block text-center position-relative">
+        <div class="glass-card-dark p-4 text-center rounded-4 border-secondary shadow-lg">
+          <div class="stat-icon bg-primary bg-opacity-25 text-primary mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.8rem;">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+          <h3 class="fw-bold mb-1 text-white">{{ posts.paginator.count|default:posts.count }}</h3>
+          <p class="text-secondary small mb-0">Published Deep Dives</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Featured Section (Only when no search/tag filter active) -->
+  {% if featured_posts and not search_query and not current_category and not current_tag %}
+    <div class="mb-5">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <h3 class="font-heading fw-bold mb-0">
+          <i class="fa-solid fa-fire text-warning me-2"></i>Featured Stories
+        </h3>
+        <span class="text-secondary small fw-medium">Top read articles this week</span>
+      </div>
+
+      <div class="row g-4">
+        {% for post in featured_posts %}
+          <div class="col-lg-4 col-md-6">
+            <div class="card-modern h-100 d-flex flex-column">
+              {% if post.featured_image %}
+                <div class="card-img-zoom" style="height: 180px;">
+                  <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="h-100 w-100 object-fit-cover">
+                </div>
+              {% else %}
+                <div class="bg-gradient p-4 text-white d-flex align-items-center justify-content-center" style="height: 180px; background: linear-gradient(135deg, #1e1b4b, #4338ca);">
+                  <i class="fa-solid fa-code display-4 opacity-50"></i>
+                </div>
+              {% endif %}
+
+              <div class="card-body p-4 d-flex flex-column flex-grow-1">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  {% if post.category %}
+                    <span class="badge-pill-category"><i class="fa-solid fa-folder me-1"></i>{{ post.category.name }}</span>
+                  {% endif %}
+                  <small class="text-muted"><i class="fa-regular fa-clock me-1"></i>{{ post.created_at|date:"M d" }}</small>
+                </div>
+
+                <h5 class="font-heading fw-bold mb-2">
+                  <a href="{{ post.get_absolute_url }}" class="text-dark text-decoration-none hover-primary">
+                    {{ post.title }}
+                  </a>
+                </h5>
+
+                <p class="text-secondary small mb-3 flex-grow-1">
+                  {{ post.content|striptags|truncatewords:16 }}
+                </p>
+
+                <div class="pt-3 border-top d-flex align-items-center justify-content-between text-muted small mt-auto">
+                  <div class="d-flex align-items-center gap-2">
+                    {% if post.author.profile.avatar and post.author.profile.avatar.name != 'avatars/default.png' %}
+                      <img src="{{ post.author.profile.avatar.url }}" alt="{{ post.author.username }}" class="rounded-circle" width="26" height="26" style="object-fit: cover;" onerror="this.onerror=null; this.src='/media/avatars/default.png';">
+                    {% else %}
+                      <i class="fa-solid fa-user-circle fs-6"></i>
+                    {% endif %}
+                    <span class="fw-medium text-dark">{{ post.author.username }}</span>
+                  </div>
+                  <div>
+                    <span class="me-2"><i class="fa-solid fa-eye me-1"></i>{{ post.views_count }}</span>
+                    <span><i class="fa-solid fa-heart text-danger me-1"></i>{{ post.total_likes }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Search / Filter Results Header -->
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h3 class="font-heading fw-bold mb-1">
+        {% if search_query %}
+          <i class="fa-solid fa-magnifying-glass text-primary me-2"></i>Results for "{{ search_query }}"
+        {% elif current_category %}
+          <i class="fa-solid fa-folder-open text-primary me-2"></i>Topic: {{ current_category.name }}
+        {% elif current_tag %}
+          <i class="fa-solid fa-hashtag text-primary me-2"></i>Tag: {{ current_tag.name }}
+        {% else %}
+          <i class="fa-solid fa-newspaper text-primary me-2"></i>Latest Articles
+        {% endif %}
+      </h3>
+      <p class="text-secondary small mb-0">Showing {{ posts|length }} published articles</p>
+    </div>
+
+    {% if search_query or current_category or current_tag %}
+      <a href="{% url 'blog:home' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+        <i class="fa-solid fa-xmark me-1"></i> Clear Filter
+      </a>
+    {% endif %}
+  </div>
+
+  <!-- Articles Grid -->
+  {% if posts %}
+    <div class="row g-4 mb-5">
+      {% for post in posts %}
+        <div class="col-lg-4 col-md-6">
+          <div class="card-modern h-100 d-flex flex-column">
+            
+            <div class="card-img-zoom" style="height: 200px;">
+              {% if post.featured_image %}
+                <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="h-100 w-100 object-fit-cover">
+              {% else %}
+                <div class="h-100 w-100 bg-gradient p-4 text-white d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #0f172a 0%, #312e81 100%);">
+                  <i class="fa-solid fa-newspaper display-3 opacity-25"></i>
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="card-body p-4 d-flex flex-column flex-grow-1">
+              
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                {% if post.category %}
+                  <a href="{{ post.category.get_absolute_url }}" class="badge-pill-category text-decoration-none">
+                    <i class="fa-solid fa-layer-group me-1"></i>{{ post.category.name }}
+                  </a>
+                {% else %}
+                  <span class="badge-pill-category text-muted"><i class="fa-solid fa-tag me-1"></i>General</span>
+                {% endif %}
+                <span class="text-muted small"><i class="fa-regular fa-calendar me-1"></i>{{ post.created_at|date:"M d, Y" }}</span>
+              </div>
+
+              <h5 class="font-heading fw-bold mb-2">
+                <a href="{{ post.get_absolute_url }}" class="text-dark text-decoration-none hover-primary">
+                  {{ post.title }}
+                </a>
+              </h5>
+
+              <p class="text-secondary small mb-3 flex-grow-1">
+                {{ post.content|striptags|truncatewords:22 }}
+              </p>
+
+              <!-- Tags list -->
+              {% if post.tags.all %}
+                <div class="d-flex flex-wrap gap-1 mb-3">
+                  {% for tag in post.tags.all|slice:":3" %}
+                    <a href="{{ tag.get_absolute_url }}" class="badge-pill-tag text-decoration-none">#{{ tag.name }}</a>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              <div class="pt-3 border-top d-flex align-items-center justify-content-between text-muted small mt-auto">
+                <a href="{% url 'blog:profile' username=post.author.username %}" class="d-flex align-items-center gap-2 text-decoration-none text-dark">
+                  {% if post.author.profile.avatar and post.author.profile.avatar.name != 'avatars/default.png' %}
+                    <img src="{{ post.author.profile.avatar.url }}" alt="{{ post.author.username }}" class="rounded-circle" width="28" height="28" style="object-fit: cover;" onerror="this.onerror=null; this.src='/media/avatars/default.png';">
+                  {% else %}
+                    <i class="fa-solid fa-user-circle fs-5 text-primary"></i>
+                  {% endif %}
+                  <span class="fw-semibold small">{{ post.author.username }}</span>
+                </a>
+
+                <div class="d-flex gap-3 text-secondary">
+                  <span><i class="fa-solid fa-eye me-1 text-primary opacity-75"></i>{{ post.views_count }}</span>
+                  <span><i class="fa-solid fa-heart me-1 text-danger opacity-75"></i>{{ post.total_likes }}</span>
+                  <span><i class="fa-solid fa-comments me-1 text-info opacity-75"></i>{{ post.total_comments }}</span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+      <nav class="d-flex justify-content-center my-4">
+        <ul class="pagination pagination-md gap-1">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link rounded-circle border-0 shadow-sm" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">
+                <i class="fa-solid fa-chevron-left"></i>
+              </a>
+            </li>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li class="page-item active">
+                <span class="page-link rounded-circle bg-primary-grad border-0 text-white fw-bold">{{ num }}</span>
+              </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link rounded-circle border-0 shadow-sm text-dark" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link rounded-circle border-0 shadow-sm" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">
+                <i class="fa-solid fa-chevron-right"></i>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
+
+  {% else %}
+    <div class="card-modern p-5 text-center my-4">
+      <div class="mb-3 text-secondary display-3">
+        <i class="fa-solid fa-newspaper-o opacity-50"></i>
+      </div>
+      <h4 class="font-heading fw-bold">No Articles Found</h4>
+      <p class="text-secondary max-w-md mx-auto mb-4">We couldn't find any articles matching your search criteria. Try browsing all topics or clearing filters.</p>
+      <a href="{% url 'blog:home' %}" class="btn btn-primary-grad px-4">Browse All Articles</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

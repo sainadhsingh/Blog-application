@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block title %}Content Portal & Administration | Tech Blogs{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Dashboard Header -->
+  <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <h2 class="font-heading fw-bold mb-0">
+          <i class="fa-solid fa-chart-pie text-primary me-2"></i>Author Portal & Content Console
+        </h2>
+        {% if user.is_superuser %}
+          <span class="badge bg-warning text-dark px-3 py-1 rounded-pill small fw-semibold"><i class="fa-solid fa-shield-halved me-1"></i> Super Admin</span>
+        {% elif user.is_staff %}
+          <span class="badge bg-info text-dark px-3 py-1 rounded-pill small fw-semibold"><i class="fa-solid fa-user-shield me-1"></i> Staff Editor</span>
+        {% endif %}
+      </div>
+      <p class="text-secondary small mb-0">Manage your published engineering articles, drafts, metrics, and reader engagements.</p>
+    </div>
+
+    <div class="d-flex gap-2">
+      <a href="{% url 'blog:post_create' %}" class="btn btn-primary-grad px-4">
+        <i class="fa-solid fa-plus me-1.5"></i> Create New Article
+      </a>
+      {% if user.is_staff %}
+        <a href="/admin/" target="_blank" class="btn btn-outline-dark rounded-pill px-3">
+          <i class="fa-solid fa-gears me-1"></i> Django Admin
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- KPI Analytics Metrics Row -->
+  <div class="row g-3 mb-4">
+    
+    <div class="col-xl-3 col-sm-6">
+      <div class="stat-box d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-secondary small font-heading fw-semibold">Total Articles</span>
+          <h3 class="font-heading fw-bold mb-0 mt-1 text-dark">{{ total_posts }}</h3>
+        </div>
+        <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+          <i class="fa-solid fa-newspaper"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+      <div class="stat-box d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-secondary small font-heading fw-semibold">Published</span>
+          <h3 class="font-heading fw-bold mb-0 mt-1 text-success">{{ published_count }}</h3>
+        </div>
+        <div class="stat-icon bg-success bg-opacity-10 text-success">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+      <div class="stat-box d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-secondary small font-heading fw-semibold">Drafts</span>
+          <h3 class="font-heading fw-bold mb-0 mt-1 text-warning">{{ draft_count }}</h3>
+        </div>
+        <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+          <i class="fa-solid fa-file-pen"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+      <div class="stat-box d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-secondary small font-heading fw-semibold">Total Views</span>
+          <h3 class="font-heading fw-bold mb-0 mt-1 text-info">{{ total_views }}</h3>
+        </div>
+        <div class="stat-icon bg-info bg-opacity-10 text-info">
+          <i class="fa-solid fa-eye"></i>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Content Management Table Section -->
+  <div class="card-modern p-4 mb-4">
+    
+    <!-- Table Header & Status Filter Pills -->
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4 pb-3 border-bottom">
+      <div>
+        <h4 class="font-heading fw-bold mb-0">Your Articles & Drafts</h4>
+        <small class="text-secondary">Click any post title to read or modify your articles.</small>
+      </div>
+
+      <div class="d-flex gap-2">
+        <a href="?status=all" class="btn btn-sm rounded-pill px-3 {% if current_status == 'all' or not current_status %}btn-dark{% else %}btn-outline-secondary{% endif %}">
+          All ({{ total_posts }})
+        </a>
+        <a href="?status=published" class="btn btn-sm rounded-pill px-3 {% if current_status == 'published' %}btn-success{% else %}btn-outline-success{% endif %}">
+          Published ({{ published_count }})
+        </a>
+        <a href="?status=draft" class="btn btn-sm rounded-pill px-3 {% if current_status == 'draft' %}btn-warning text-dark{% else %}btn-outline-warning{% endif %}">
+          Drafts ({{ draft_count }})
+        </a>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    {% if posts %}
+      <div class="table-responsive">
+        <table class="table table-modern align-middle mb-0">
+          <thead class="table-light text-secondary small text-uppercase font-heading">
+            <tr>
+              <th scope="col" style="width: 40%;">Article Title</th>
+              <th scope="col">Category</th>
+              <th scope="col">Status</th>
+              <th scope="col" class="text-center">Views</th>
+              <th scope="col" class="text-center">Likes</th>
+              <th scope="col">Date</th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for post in posts %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-3">
+                    {% if post.featured_image %}
+                      <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="rounded-2" width="48" height="48" style="object-fit: cover;">
+                    {% else %}
+                      <div class="rounded-2 bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                        <i class="fa-solid fa-file-lines"></i>
+                      </div>
+                    {% endif %}
+                    <div>
+                      <h6 class="fw-bold mb-0">
+                        <a href="{{ post.get_absolute_url }}" class="text-dark text-decoration-none hover-primary">
+                          {{ post.title }}
+                        </a>
+                      </h6>
+                      <small class="text-secondary">/post/{{ post.slug|truncatechars:30 }}</small>
+                    </div>
+                  </div>
+                </td>
+
+                <td>
+                  {% if post.category %}
+                    <span class="badge-pill-category"><i class="fa-solid fa-folder me-1"></i>{{ post.category.name }}</span>
+                  {% else %}
+                    <span class="badge-pill-tag">Uncategorized</span>
+                  {% endif %}
+                </td>
+
+                <td>
+                  {% if post.status == 'published' %}
+                    <span class="badge bg-success bg-opacity-15 text-success fw-semibold px-2.5 py-1 rounded-pill small">
+                      <i class="fa-solid fa-circle-check me-1"></i> Published
+                    </span>
+                  {% else %}
+                    <span class="badge bg-warning bg-opacity-20 text-warning-emphasis fw-semibold px-2.5 py-1 rounded-pill small">
+                      <i class="fa-solid fa-clock me-1"></i> Draft
+                    </span>
+                  {% endif %}
+                </td>
+
+                <td class="text-center fw-semibold text-secondary">
+                  <i class="fa-solid fa-eye me-1 text-primary"></i> {{ post.views_count }}
+                </td>
+
+                <td class="text-center fw-semibold text-secondary">
+                  <i class="fa-solid fa-heart me-1 text-danger"></i> {{ post.total_likes }}
+                </td>
+
+                <td class="small text-secondary">
+                  {{ post.created_at|date:"M d, Y" }}
+                </td>
+
+                <td class="text-end">
+                  <div class="d-inline-flex gap-1">
+                    <a href="{{ post.get_absolute_url }}" class="btn btn-light btn-sm rounded-circle p-2 text-primary" data-bs-toggle="tooltip" title="View Article">
+                      <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                    <a href="{% url 'blog:post_edit' slug=post.slug %}" class="btn btn-light btn-sm rounded-circle p-2 text-warning" data-bs-toggle="tooltip" title="Edit Post">
+                      <i class="fa-solid fa-pen"></i>
+                    </a>
+                    <a href="{% url 'blog:post_delete' slug=post.slug %}" class="btn btn-light btn-sm rounded-circle p-2 text-danger" data-bs-toggle="tooltip" title="Delete Post">
+                      <i class="fa-solid fa-trash-can"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if is_paginated %}
+        <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
+          <span class="small text-secondary">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+          <ul class="pagination pagination-sm mb-0">
+            {% if page_obj.has_previous %}
+              <li class="page-item"><a class="page-link rounded-circle" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+            {% endif %}
+            <li class="page-item active"><span class="page-link rounded-circle">{{ page_obj.number }}</span></li>
+            {% if page_obj.has_next %}
+              <li class="page-item"><a class="page-link rounded-circle" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      {% endif %}
+
+    {% else %}
+      <div class="text-center py-5">
+        <div class="text-secondary opacity-50 display-4 mb-3">
+          <i class="fa-solid fa-folder-open"></i>
+        </div>
+        <h5 class="font-heading fw-bold">No Articles Found</h5>
+        <p class="text-secondary small mb-3">You haven't written any posts under this status filter yet.</p>
+        <a href="{% url 'blog:post_create' %}" class="btn btn-primary-grad btn-sm px-4">
+          <i class="fa-solid fa-plus me-1"></i> Create Your First Article
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
+
+</div>
+{% endblock %}

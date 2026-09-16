@@ -1,0 +1,21 @@
+{
+  "exclude": [
+    ".venv/**",
+    "**/__pycache__/**"
+  ],
+  "disabled-rules": [
+    "bad-argument-type",
+    "missing-argument",
+    "missing-attribute",
+    "untyped-import",
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "no-matching-overload",
+    "not-callable",
+    "unknown-attribute",
+    "type-error",
+    "invalid-argument"
+  ]
+}
+
